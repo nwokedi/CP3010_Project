@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
+import Layout from '../components/Layout';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -30,6 +31,7 @@ const LoginPage = () => {
   };
 
   return (
+    <Layout>
     <Container>
       <Row className="justify-content-center mt-5">
         <Col md={6}>
@@ -74,6 +76,7 @@ const LoginPage = () => {
         </Col>
       </Row>
     </Container>
+    </Layout>
   );
 };
 

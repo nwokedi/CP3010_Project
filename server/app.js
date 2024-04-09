@@ -1,30 +1,21 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const authRoutes = require('./routes/authRoutes');
-const triviaRoutes = require('./routes/triviaRoutes');
-const userStatsRoutes = require('./routes/userStatsRoutes');
-const cookieParser = require('cookie-parser');
-const cors = require('cors');
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import TriviaPage from './pages/TriviaPage';
+import UserStatsPage from './pages/UserStatsPage';
+import TriviaAdminPage from './pages/TriviaAdminPage';
 
-const app = express();
-const port = process.env.PORT || 8000;
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/trivia" element={<TriviaPage />} />
+        <Route path="/user-stats" element={<UserStatsPage />} />
+        <Route path="/admin/trivia" element={<TriviaAdminPage />} />
+      </Routes>
+    </Router>
+  );
+}
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost/trivia-app', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-// Middleware
-app.use(express.json());
-app.use(cookieParser());
-app.use(cors());
-
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/trivia', triviaRoutes);
-app.use('/api/user-stats', userStatsRoutes);
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+export default App;
