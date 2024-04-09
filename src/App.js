@@ -1,21 +1,27 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginPage from './components/LoginPage';
-import SignupPage from './components/SignupPage'; // Import the SignupPage
-import QuestionPage from './components/QuestionPage';
-import StatsPage from './components/StatsPage';
+import LoginPage from './pages/LoginPage';
+import TriviaPage from './pages/TriviaPage';
+import UserStatsPage from './pages/UserStatsPage';
+import TriviaAdminPage from './pages/TriviaAdminPage';
+//import NavigationBar from './pages/NavigationBar'; 
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} /> {/* Add this line */}
-        <Route path="/question" element={<QuestionPage />} />
-        <Route path="/stats" element={<StatsPage />} />
+        <Route path="/trivia" element={<TriviaPage />} />
+        <Route path="/user-stats" element={<UserStatsPage />} />
+        <Route path="/admin/trivia" element={<TriviaAdminPage />} /> {/* Add the new route */}
       </Routes>
     </Router>
   );
 }
 
 export default App;
+
+
+
+
+
