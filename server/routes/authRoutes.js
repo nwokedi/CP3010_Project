@@ -4,6 +4,9 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 //const axios = require('axios');
+require('dotenv').config()
+
+
 
 // Register a new user
 router.post('/register', async (req, res) => {
@@ -18,7 +21,7 @@ router.post('/register', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
-
+/*
 // Login a user
 router.post('/login', async (req, res) => {
   try {
@@ -34,9 +37,32 @@ router.post('/login', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+*/
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      console.error('User not found:', email);
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    if (!(await user.comparePassword(password))) {
+      console.error('Invalid password for user:', email);
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    const token = generateToken(user);
+    res.cookie('token', token, { httpOnly: true });
+    res.json({ token });
+  } catch (error) {
+    console.error('Error in login route:', error);
+    res.status(400).json({ message: error.message });
+  }
+});
 
 // Google OAuth login
 router.get('/google/login', async (req, res) => {
+  console.log('Google login request received');
+  console.log('accessToken:', req.body.accessToken);  //remove after
   try {
     const { token } = req.query;
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -58,29 +84,8 @@ router.get('/google/login', async (req, res) => {
   }
 });
 
-// Google OAuth login
-router.post('/google/login', async (req, res) => {
-  try {
-    const { token } = req.body;
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const { email } = ticket.getPayload();
-    let user = await User.findOne({ email });
-    if (!user) {
-      user = new User({ email });
-      await user.save();
-    }
-    const jwtToken = generateToken(user);
-    res.json({ token: jwtToken });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
 function generateToken(user) {
-  return jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+  return jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '48h' });
 }
 
 module.exports = router;

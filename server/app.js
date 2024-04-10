@@ -1,9 +1,10 @@
-// server.js
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
 const triviaRoutes = require('./routes/triviaRoutes');
 const userStatsRoutes = require('./routes/userStatsRoutes');
+
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -19,9 +20,9 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+console.error('Server error:', err);
 app.use('/api/trivia', triviaRoutes);
 app.use('/api/user-stats', userStatsRoutes);
-
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
