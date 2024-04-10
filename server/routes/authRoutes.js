@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
-const axios = require('axios');
+//const axios = require('axios');
 
 // Register a new user
 router.post('/register', async (req, res) => {
@@ -52,6 +52,27 @@ router.get('/google/login', async (req, res) => {
     }
     const jwtToken = generateToken(user);
     res.cookie('token', jwtToken, { httpOnly: true });
+    res.json({ token: jwtToken });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Google OAuth login
+router.post('/google/login', async (req, res) => {
+  try {
+    const { token } = req.body;
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const { email } = ticket.getPayload();
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = new User({ email });
+      await user.save();
+    }
+    const jwtToken = generateToken(user);
     res.json({ token: jwtToken });
   } catch (error) {
     res.status(400).json({ message: error.message });

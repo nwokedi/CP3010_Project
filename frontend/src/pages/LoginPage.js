@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
+import GoogleLogin from 'react-google-login';
 import Layout from '../components/Layout';
 
 const LoginPage = () => {
@@ -20,10 +21,11 @@ const LoginPage = () => {
     }
   };
 
-  const handleOAuthLogin = async (provider) => {
+  const handleGoogleLogin = async (response) => {
     try {
-      const response = await axios.get(`/api/auth/${provider}/login`);
-      localStorage.setItem('token', response.data.token);
+      const { tokenId } = response;
+      const res = await axios.post('/api/auth/google/login', { token: tokenId });
+      localStorage.setItem('token', res.data.token);
       navigate('/trivia');
     } catch (error) {
       console.error(error);
@@ -63,12 +65,12 @@ const LoginPage = () => {
           </Form>
           <div className="mt-3">
             <p>Or login with:</p>
-            <Button variant="secondary" onClick={() => handleOAuthLogin('google')}>
-              Google
-            </Button>
-            <Button variant="secondary" onClick={() => handleOAuthLogin('facebook')}>
-              Facebook
-            </Button>
+            <GoogleLogin
+              clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+              onSuccess={handleGoogleLogin}
+              onFailure={(error) => console.error(error)}
+              cookiePolicy={'single_host_origin'}
+            />
           </div>
           <p className="mt-3">
             Don't have an account? <Link to="/register">Register</Link>
