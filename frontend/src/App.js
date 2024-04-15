@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import LoginPage from './pages/LoginPage';
@@ -8,43 +8,25 @@ import axios from 'axios';
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const axiosInstance = axios.create({
-    baseURL: '/api',
-  });
-
-
-  useEffect(() => {
-    // Check if the user is authenticated (by checking the token in localStorage)
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, []);
-
-  // console log
-console.log('Base URL:', axiosInstance.defaults.baseURL);// Check if the base URL is correct
-console.log('Sending POST request to:', '/api/auth/google/login');
-
-
-
-
   const handleGoogleLogin = async (accessToken) => {
     try {
+      console.log('Handling Google login...');
       const response = await axios.post('/api/auth/google/login', { accessToken });
+      console.log('Google login response:', response.data);
       localStorage.setItem('token', response.data.token);
       setIsAuthenticated(true);
     } catch (error) {
-      console.error('Error in Google login:', error); 
-      console.log('Response details:', error.response); // Log details for analysis
+      console.error('Error in Google login:', error);
+      console.log('Response details:', error.response);
       console.error('Error logging in with Google:', error);
     }
   };
 
   const handleEmailPasswordLogin = async (email, password) => {
     try {
+      console.log('Handling email/password login...');
       const response = await axios.post('/api/auth/login', { email, password });
+      console.log('Email/password login response:', response.data);
       localStorage.setItem('token', response.data.token);
       setIsAuthenticated(true);
     } catch (error) {
@@ -53,8 +35,8 @@ console.log('Sending POST request to:', '/api/auth/google/login');
   };
 
   return (
-    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
-      <Router>
+    <Router>
+      <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
         <Routes>
           <Route
             path="/login"
@@ -71,9 +53,8 @@ console.log('Sending POST request to:', '/api/auth/google/login');
           />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
-      </Router>
-    </GoogleOAuthProvider>
+      </GoogleOAuthProvider>
+    </Router>
   );
 };
-
 export default App;
